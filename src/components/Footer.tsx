@@ -9,7 +9,7 @@ const Footer = () => {
           {/* Column 1 - About */}
           <div>
             <div className="flex items-center mb-4">
-              <img src="../../public/pictures/logo.png" alt="" width={170}height={100}/>
+              <img src="/pictures/logo.png" alt="" width={170}height={100}/>
             </div>
             <p className="text-green-100 mb-4">
               Empowering underprivileged communities through innovative, sustainable agricultural solutions since 2008.
