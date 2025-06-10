@@ -44,7 +44,7 @@ const Navbar = ({ onLoginClick }: NavbarProps) => {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <NavLink to="/" className="flex items-center ">
-              <img src="../../public/pictures/logo.png" alt="" width={170}height={100}/>
+              <img src="/pictures/logo.png" alt="" width={170}height={100}/>
             </NavLink>
           </div>
           
