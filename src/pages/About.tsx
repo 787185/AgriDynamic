@@ -124,10 +124,9 @@ const About = () => {
           <p className="text-lg mb-8">
             We collaborate with innovators, donors, institutions, and changemakers to deliver lasting solutions to poverty, food insecurity, and economic exclusion. If you believe in transforming lives through smart, inclusive agriculture, we invite you to join us.
           </p>
-          <a
-            href="/contact"
-            className="inline-block px-6 py-3 bg-white text-green-700 hover:bg-gray-100 font-medium rounded-md transition-colors duration-200"
-          >
+          <Link to="/contact" className="inline-block px-6 py-3 bg-white text-green-700 hover:bg-gray-100 font-medium rounded-md transition-colors duration-200">
+            Partner With Us
+          </Link>
             Partner With Us
           </a>
         </div>
