@@ -69,7 +69,7 @@ const Navbar = ({ onLoginClick }: NavbarProps) => {
             {isAuthenticated ? (
               <button
                 onClick={logout}
-                className="ml-4 px-4 py-2 rounded-md text-sm font-medium text-white bg-green-800 hover:bg-green-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200"
+                className="ml-4 px-4 py-2 rounded-3xl text-sm font-medium text-white bg-green-800 hover:bg-green-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200"
               >
                 Logout
               </button>

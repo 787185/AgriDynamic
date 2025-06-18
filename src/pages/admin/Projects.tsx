@@ -1,93 +1,200 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Plus, Edit, Trash } from 'lucide-react';
 import AdminForm from '../../components/admin/AdminForm';
-import { projects as initialProjects } from '../../data';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const ARTICLES_API_URL = `${API_BASE_URL}/articles`;
+
+interface AdminContentItem {
+  _id: string;
+  title: string;
+  description: string;
+  image: string;
+  author: { _id: string; name: string; email: string; } | string;
+  published: boolean;
+  createdAt: string;
+  updatedAt?: string;
+  contributors?: string[];
+  status: 'upcoming' | 'completed' | 'in-progress' | 'archived';
+  background?: string;
+  methodology?: string;
+  results?: string;
+  conclusions?: string;
+  recommendations?: string;
+  application?: string;
+}
 
 const Projects = () => {
-  const [projects, setProjects] = useState(initialProjects);
+  const [projects, setProjects] = useState<AdminContentItem[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [editingProject, setEditingProject] = useState<null | any>(null);
-  
-  const handleCreate = (data: Record<string, string>) => {
-    const contributorsArray = data.contributors.split(',').map(c => c.trim());
+  const [editingProject, setEditingProject] = useState<AdminContentItem | null>(null);
+
+  // Removed getToken function as authorization is no longer used here
+
+  // --- FETCH PROJECTS FOR ADMIN TABLE ---
+  const fetchProjects = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      // Removed config object as authorization header is no longer needed
+      const response = await axios.get<AdminContentItem[]>(ARTICLES_API_URL);
+      setProjects(response.data);
+    } catch (err) {
+      console.error('Error fetching projects:', err);
+      if (axios.isAxiosError(err) && err.response) {
+        setError(err.response.data.message || 'Failed to load projects.');
+      } else {
+        setError('An unexpected error occurred while loading projects.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  // --- HANDLE CREATE ---
+  const handleCreate = async (data: Record<string, string>) => {
+    const contributorsArray = data.contributors ? data.contributors.split(',').map(c => c.trim()) : [];
     
-    const newProject = {
-      id: projects.length > 0 ? Math.max(...projects.map(p => p.id)) + 1 : 1,
+    let backendStatus = data.status;
+    if (data.status === 'incomplete') {
+        backendStatus = 'upcoming'; 
+    }
+
+    const newProjectPayload = {
       title: data.title,
       description: data.description,
       image: data.image,
       contributors: contributorsArray,
-      status: data.status as 'completed' | 'incomplete',
-      content: data.status === 'completed' ? {
-        background: data.background,
-        methodology: data.methodology,
-        results: data.results,
-        conclusions: data.conclusions,
-        recommendations: data.recommendations,
-        application: data.application
-      } : undefined
+      status: backendStatus,
+      background: data.background || '',
+      methodology: data.methodology || '',
+      results: data.results || '',
+      conclusions: data.conclusions || '',
+      recommendations: data.recommendations || '',
+      application: data.application || '',
+      published: false,
     };
-    
-    setProjects([...projects, newProject]);
-    setShowCreateForm(false);
-  };
-  
-  const handleEdit = (data: Record<string, string>) => {
-    if (!editingProject) return;
-    
-    const contributorsArray = data.contributors.split(',').map(c => c.trim());
-    
-    setProjects(projects.map(project => 
-      project.id === editingProject.id
-        ? { 
-            ...project, 
-            title: data.title,
-            description: data.description,
-            image: data.image,
-            contributors: contributorsArray,
-            status: data.status as 'completed' | 'incomplete',
-            content: data.status === 'completed' ? {
-              background: data.background,
-              methodology: data.methodology,
-              results: data.results,
-              conclusions: data.conclusions,
-              recommendations: data.recommendations,
-              application: data.application
-            } : undefined
-         }
-        : project
-    ));
-    
-    setEditingProject(null);
-  };
-  
-  const handleDelete = (id: number) => {
-    setProjects(projects.filter(project => project.id !== id));
+
+    try {
+      setLoading(true);
+      // Removed config object and Authorization header
+      await axios.post(ARTICLES_API_URL, newProjectPayload, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+      setShowCreateForm(false);
+      await fetchProjects();
+    } catch (err) {
+      console.error('Error creating project:', err);
+      if (axios.isAxiosError(err) && err.response) {
+        alert(`Error creating project: ${err.response.data.message || 'Server error'}`);
+      } else {
+        alert('An unexpected error occurred during creation.');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
+  // --- HANDLE EDIT ---
+  const handleEdit = async (data: Record<string, string>) => {
+    if (!editingProject) return;
+
+    const contributorsArray = data.contributors ? data.contributors.split(',').map(c => c.trim()) : [];
+
+    const updatedProjectPayload = {
+      title: data.title,
+      description: data.description,
+      image: data.image,
+      contributors: contributorsArray,
+      status: data.status,
+      background: data.background || '',
+      methodology: data.methodology || '',
+      results: data.results || '',
+      conclusions: data.conclusions || '',
+      recommendations: data.recommendations || '',
+      application: data.application || '',
+      published: editingProject.published,
+    };
+
+    try {
+      setLoading(true);
+      // Removed config object and Authorization header
+      await axios.put(`${ARTICLES_API_URL}/${editingProject._id}`, updatedProjectPayload, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+      setEditingProject(null);
+      await fetchProjects();
+    } catch (err) {
+      console.error('Error updating project:', err);
+      if (axios.isAxiosError(err) && err.response) {
+        alert(`Error updating project: ${err.response.data.message || 'Server error'}`);
+      } else {
+        alert('An unexpected error occurred during update.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // --- HANDLE DELETE ---
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Are you sure you want to delete this project?')) return;
+
+    try {
+      setLoading(true);
+      // Removed config object and Authorization header
+      await axios.delete(`${ARTICLES_API_URL}/${id}`);
+      await fetchProjects();
+    } catch (err) {
+      console.error('Error deleting project:', err);
+      if (axios.isAxiosError(err) && err.response) {
+        alert(`Error deleting project: ${err.response.data.message || 'Server error'}`);
+      } else {
+        alert('An unexpected error occurred during deletion.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="p-4 text-center text-gray-700">Loading projects...</div>;
+  }
+
+  if (error) {
+    return <div className="p-4 text-center text-red-600">Error: {error}</div>;
+  }
+
   return (
-    <div>
+    <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Projects</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Manage Projects/Articles</h1>
         <button
           onClick={() => setShowCreateForm(true)}
-          className="px-4 py-2 bg-green-700 hover:bg-green-800 text-white rounded-xl transition-colors duration-200 flex items-center"
+          className="px-4 py-2 bg-green-700 hover:bg-green-800 text-white rounded-3xl transition-colors duration-200 flex items-center"
         >
           <Plus className="h-4 w-4 mr-2" />
-          Create
+          Create New
         </button>
       </div>
       
       {/* Table */}
-      <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
+      <div className="bg-white shadow-md rounded-lg ">
+        <table className="min-w-full divide-y divide-gray-200 overflow-x-auto ">
           <thead className="bg-gray-50">
             <tr>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 ID
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Project Title
+                Project/Article Title
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Status
@@ -99,9 +206,9 @@ const Projects = () => {
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {projects.map((project) => (
-              <tr key={project.id}>
+              <tr key={project._id}>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {project.id}
+                  {project._id}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {project.title}
@@ -110,9 +217,13 @@ const Projects = () => {
                   <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                     project.status === 'completed' 
                       ? 'bg-green-100 text-green-800' 
-                      : 'bg-yellow-100 text-yellow-800'
+                      : project.status === 'in-progress'
+                      ? 'bg-blue-100 text-blue-800'
+                      : project.status === 'upcoming'
+                      ? 'bg-yellow-100 text-yellow-800'
+                      : 'bg-gray-100 text-gray-800'
                   }`}>
-                    {project.status === 'completed' ? 'Completed' : 'Upcoming'}
+                    {project.status}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -125,7 +236,7 @@ const Projects = () => {
                       <Edit className="h-5 w-5" />
                     </button>
                     <button
-                      onClick={() => handleDelete(project.id)}
+                      onClick={() => handleDelete(project._id)}
                       className="text-red-600 hover:text-red-800"
                       aria-label={`Delete ${project.title}`}
                     >
@@ -139,7 +250,7 @@ const Projects = () => {
             {projects.length === 0 && (
               <tr>
                 <td colSpan={4} className="px-6 py-4 text-center text-sm text-gray-500">
-                  No projects found
+                  No projects/articles found
                 </td>
               </tr>
             )}
@@ -148,23 +259,24 @@ const Projects = () => {
       </div>
       
       {/* Create Form */}
-      
       {showCreateForm && (
         <AdminForm
-          title="Add New Project"
+          title="Add New Project/Article"
           fields={[
-            { name: 'title', label: 'Project Title', type: 'text', defaultValue: '', required: true },
+            { name: 'title', label: 'Title', type: 'text', defaultValue: '', required: true },
             { name: 'description', label: 'Brief Description', type: 'textarea', defaultValue: '', required: true },
             { name: 'image', label: 'Image URL', type: 'text', defaultValue: 'https://images.pexels.com/photos/2252584/pexels-photo-2252584.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', required: true },
-            { name: 'contributors', label: 'Contributors (comma-separated)', type: 'text', defaultValue: '', required: true },
+            { name: 'contributors', label: 'Contributors (comma-separated)', type: 'text', defaultValue: '' },
             { 
               name: 'status', 
               label: 'Status', 
               type: 'select', 
-              defaultValue: 'incomplete',
+              defaultValue: 'upcoming',
               options: [
+                { value: 'upcoming', label: 'Upcoming' },
+                { value: 'in-progress', label: 'In-Progress' },
                 { value: 'completed', label: 'Completed' },
-                { value: 'incomplete', label: 'Upcoming' }
+                { value: 'archived', label: 'Archived' }
               ],
               required: true 
             },
@@ -183,29 +295,31 @@ const Projects = () => {
       {/* Edit Form */}
       {editingProject && (
         <AdminForm
-          title="Edit Project"
+          title="Edit Project/Article"
           fields={[
-            { name: 'title', label: 'Project Title', type: 'text', defaultValue: editingProject.title, required: true },
+            { name: 'title', label: 'Title', type: 'text', defaultValue: editingProject.title, required: true },
             { name: 'description', label: 'Brief Description', type: 'textarea', defaultValue: editingProject.description, required: true },
             { name: 'image', label: 'Image URL', type: 'text', defaultValue: editingProject.image, required: true },
-            { name: 'contributors', label: 'Contributors (comma-separated)', type: 'text', defaultValue: editingProject.contributors.join(', '), required: true },
+            { name: 'contributors', label: 'Contributors (comma-separated)', type: 'text', defaultValue: editingProject.contributors?.join(', ') || '' },
             { 
               name: 'status', 
               label: 'Status', 
               type: 'select', 
               defaultValue: editingProject.status,
               options: [
+                { value: 'upcoming', label: 'Upcoming' },
+                { value: 'in-progress', label: 'In-Progress' },
                 { value: 'completed', label: 'Completed' },
-                { value: 'incomplete', label: 'Upcoming' }
+                { value: 'archived', label: 'Archived' }
               ],
               required: true 
             },
-            { name: 'background', label: 'Background', type: 'textarea', defaultValue: editingProject.content?.background || '' },
-            { name: 'methodology', label: 'Methodology', type: 'textarea', defaultValue: editingProject.content?.methodology || '' },
-            { name: 'results', label: 'Main Results', type: 'textarea', defaultValue: editingProject.content?.results || '' },
-            { name: 'conclusions', label: 'Conclusions', type: 'textarea', defaultValue: editingProject.content?.conclusions || '' },
-            { name: 'recommendations', label: 'Recommendations', type: 'textarea', defaultValue: editingProject.content?.recommendations || '' },
-            { name: 'application', label: 'Application at AgriDynamic', type: 'textarea', defaultValue: editingProject.content?.application || '' }
+            { name: 'background', label: 'Background', type: 'textarea', defaultValue: editingProject.background || '' },
+            { name: 'methodology', label: 'Methodology', type: 'textarea', defaultValue: editingProject.methodology || '' },
+            { name: 'results', label: 'Main Results', type: 'textarea', defaultValue: editingProject.results || '' },
+            { name: 'conclusions', label: 'Conclusions', type: 'textarea', defaultValue: editingProject.conclusions || '' },
+            { name: 'recommendations', label: 'Recommendations', type: 'textarea', defaultValue: editingProject.recommendations || '' },
+            { name: 'application', label: 'Application at AgriDynamic', type: 'textarea', defaultValue: editingProject.application || '' }
           ]}
           onSubmit={handleEdit}
           onClose={() => setEditingProject(null)}
