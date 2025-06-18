@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom'; 
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -19,28 +19,35 @@ function App() {
 
   return (
     <AuthProvider>
-      <Router>
-        <div className="flex flex-col min-h-screen">
-          <Navbar onLoginClick={() => setShowLoginModal(true)} />
-          <main className="flex-grow">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/projects" element={<Projects />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/project/:id" element={<ProjectArticle />} />
-              <Route path="/admin" element={<AdminLayout />}>
-                <Route index element={<Volunteers />} />
-                <Route path="volunteers" element={<Volunteers />} />
-                <Route path="enquiries" element={<Enquiries />} />
-                <Route path="projects" element={<AdminProjects />} />
-              </Route>
-            </Routes>
-          </main>
-          <Footer />
-          {showLoginModal && <LoginModal onClose={() => setShowLoginModal(false)} />}
-        </div>
-      </Router>
+      <div className="flex flex-col min-h-screen">
+        <Navbar onLoginClick={() => setShowLoginModal(true)} />
+        <main className="flex-grow">
+          <Routes>
+            {/* Your routes go here directly */}
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/projects" element={<Projects />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/project/:id" element={<ProjectArticle />} />
+
+            {/* IMPORTANT: Use PrivateRoute for AdminLayout */}
+            <Route
+              path="/admin/*" // Use /* if AdminLayout has nested routes
+              element={<AdminLayout />}>
+              {/* Nested routes within AdminLayout */}
+              <Route index element={<Volunteers />} />
+              <Route path="volunteers" element={<Volunteers />} />
+              <Route path="enquiries" element={<Enquiries />} />
+              <Route path="projects" element={<AdminProjects />} />
+            </Route>
+
+            {/* Potentially add a 404 route */}
+            {/* <Route path="*" element={<NotFoundPage />} /> */}
+          </Routes>
+        </main>
+        <Footer />
+        {showLoginModal && <LoginModal onClose={() => setShowLoginModal(false)} />}
+      </div>
     </AuthProvider>
   );
 }

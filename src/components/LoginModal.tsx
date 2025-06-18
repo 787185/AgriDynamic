@@ -9,47 +9,65 @@ interface LoginModalProps {
   onClose: () => void;
 }
 
+// It's a good practice to use the environment variable for the API URL
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+
 const LoginModal = ({ onClose }: LoginModalProps) => {
-  const [email, setEmail] = useState(''); // Changed from username to email
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false); // Add loading state
-  const { login } = useAuth(); // `login` function in AuthContext should save the token
+  const [error, setError] = useState<string | null>(null); // Initialize with null, not 'null' string
+  const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => { // Made it async
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setLoading(true); // Start loading
+    setError(null); // Clear previous errors (set to null, not 'null' string)
+    setLoading(true);
 
-    if (!email || !password) { // Check for email and password
+    if (!email || !password) {
       setError('Please enter both email and password');
       setLoading(false);
       return;
     }
 
     try {
-      // Make API call to your backend login endpoint
       const response = await axios.post(
-        'https://agridynamic-backend.onrender.com/api/auth/login', // Your backend login endpoint
-        { email, password } // Send email and password
+        `${API_BASE_URL}/auth/login`, // Use environment variable for flexibility
+        { email, password }
       );
 
-      // Assuming your backend responds with a token and user data on success
-      const { token, user } = response.data;
+      // --- CRUCIAL DEBUGGING LOGS ---
+      console.log('LoginModal: Full Axios Response:', response);
+      console.log('LoginModal: Backend Response Data (response.data):', response.data);
+      // --- END DEBUGGING LOGS ---
 
-      // Call the login function from your AuthContext to store the token/user state
-      login(token, user); // Adjust `useAuth().login` to accept token and user if needed
-      onClose();
-      navigate('/admin'); // Navigate to admin dashboard on successful login
+      // Assuming your backend responds with a token and user data on success
+      const { token, user } = response.data; // This destructuring will make `token` undefined if not present in response.data
+
+      // Check if token and user data are present before calling login
+      if (token && user) {
+        login(token, user);
+        onClose();
+        navigate('/admin');
+      } else {
+        // This means the backend response was successful (200 OK) but didn't contain token/user as expected
+        setError('Login successful, but server response missing token or user data.');
+        console.error('LoginModal: Server response structure unexpected:', response.data);
+      }
 
     } catch (err: any) {
-      // Handle login errors from the backend
-      const errorMessage = err.response && err.response.data && err.response.data.msg
-        ? err.response.data.msg
-        : 'Login failed. Please try again.';
+      console.error('LoginModal: Login error caught in catch block:', err); // Log the full error object
+
+      let errorMessage = 'Login failed. Please try again.'; // Default error message
+
+      // Check if it's an Axios error and has a response from the server
+      if (axios.isAxiosError(err) && err.response) {
+        // Your backend uses 'message', not 'msg' for error details
+        errorMessage = err.response.data.message || errorMessage;
+      }
+      
       setError(errorMessage);
-      console.error('Login error:', err);
     } finally {
       setLoading(false); // End loading
     }
@@ -80,12 +98,12 @@ const LoginModal = ({ onClose }: LoginModalProps) => {
               Email
             </label>
             <input
-              id="email" // Changed from username to email
-              type="email" // Changed type to email
-              value={email} // Changed state variable
-              onChange={(e) => setEmail(e.target.value)} // Changed setter
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500"
-              placeholder="Enter your email" // Changed placeholder
+              placeholder="Enter your email"
             />
           </div>
 
@@ -107,7 +125,7 @@ const LoginModal = ({ onClose }: LoginModalProps) => {
             <button
               type="submit"
               className="px-6 py-2 bg-green-700 hover:bg-green-800 text-white rounded-3xl transition-colors duration-200"
-              disabled={loading} // Disable button while loading
+              disabled={loading}
             >
               {loading ? 'Logging in...' : 'Login'}
             </button>
