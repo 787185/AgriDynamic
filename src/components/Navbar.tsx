@@ -34,7 +34,7 @@ const Navbar = ({ onLoginClick }: NavbarProps) => {
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'About Us', path: '/about' },
-    { name: 'Projects', path: '/projects' },
+    { name: 'Institutes', path: '/projects' },
     { name: 'Contact Us', path: '/contact' }
   ];
 

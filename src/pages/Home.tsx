@@ -53,9 +53,24 @@ const Home = () => {
         title="Empowering the Underprivileged Through Innovation"
         subtitle="Since 2008, AgriDynamic has been demonstrating sustainable solutions to underprivileged persons, founded by community members with firsthand rural experience."
       />
+
+      {/* Research Focus Section - Horizontal Scrollbar */}
+      {/* The ScrollableSection component itself might need internal animation if it's not already handled */}
+      <motion.div
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={fadeInUp} // Animate the entire section
+      >
+        <ScrollableSection
+          title="Our Research & Innovation Institute"
+          subtitle="FairEducation: Research that drives impact"
+          cards={researchFocusCards}
+        />
+      </motion.div>
       
       {/* Mission Statement */}
-      <motion.section
+      {/* <motion.section
         className="py-5 bg-white text-center"
         initial="hidden"
         whileInView="visible"
@@ -79,7 +94,7 @@ const Home = () => {
             <img src="/pictures/globe.jpg" alt="Globe" width={180} height={170}/>
           </motion.div>
         </div>
-      </motion.section>
+      </motion.section> */}
       
       {/* What We Do Section - Vertical Stacked Cards */}
       <motion.section
@@ -109,20 +124,7 @@ const Home = () => {
         </div>
       </motion.section>
       
-      {/* Research Focus Section - Horizontal Scrollbar */}
-      {/* The ScrollableSection component itself might need internal animation if it's not already handled */}
-      <motion.div
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
-        variants={fadeInUp} // Animate the entire section
-      >
-        <ScrollableSection
-          title="Our Research & Innovation Institute"
-          subtitle="FairEducation: Research that drives impact"
-          cards={researchFocusCards}
-        />
-      </motion.div>
+      
       
       {/* Featured Projects Section */}
       <motion.section

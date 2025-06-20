@@ -3,31 +3,25 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { Search } from 'lucide-react'; // Import the Search icon
 import ProjectCard from '../components/ProjectCard'; // Assuming this component exists
+import { useInView } from 'react-intersection-observer'; // Import useInView
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
-// Use the specific endpoint for cards
 const ARTICLES_CARDS_API_URL = `${API_BASE_URL}/articles/cards`;
 
 // --- UPDATED INTERFACE ---
-// This interface reflects the fields returned by the /api/articles/cards endpoint
-// and matches the "fundamental" fields of your unified Article model for cards.
 interface ContentItem {
   _id: string;
   title: string;
   description: string;
   image: string;
-  author: string; // Will be the ID, you might want to populate it in backend for display name
-  status: 'upcoming' | 'completed' | 'in-progress' | 'archived'; // Status is part of card view
-  // 'contributors' is NOT returned by /articles/cards based on your specification,
-  // but if you need it for search, you'll need to fetch it or remove it from search logic.
-  // For this component, I'll keep it in the search logic, assuming it will be there.
+  author: string;
+  status: 'upcoming' | 'completed' | 'in-progress' | 'archived';
   contributors?: string[];
-  // published, createdAt, updatedAt are NOT returned by /articles/cards based on your specification
 }
 
 const Projects = () => {
-  const [allFetchedCards, setAllFetchedCards] = useState<ContentItem[]>([]); // Stores all cards fetched, before status/search filters
-  const [displayedProjects, setDisplayedProjects] = useState<ContentItem[]>([]); // The projects actually rendered after filters
+  const [allFetchedCards, setAllFetchedCards] = useState<ContentItem[]>([]);
+  const [displayedProjects, setDisplayedProjects] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -36,16 +30,14 @@ const Projects = () => {
   >('all');
 
   // --- 1. Fetch ALL card data from API on component mount ---
-  // This useEffect now runs only once to get all the fundamental data for cards.
   useEffect(() => {
     const fetchAllCards = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        // Fetch data from the specific cards endpoint
         const response = await axios.get<ContentItem[]>(ARTICLES_CARDS_API_URL);
-        setAllFetchedCards(response.data); // Store all cards
+        setAllFetchedCards(response.data);
       } catch (err) {
         console.error('Error fetching project cards:', err);
         if (axios.isAxiosError(err) && err.response) {
@@ -59,31 +51,29 @@ const Projects = () => {
     };
 
     fetchAllCards();
-  }, []); // Empty dependency array means this runs once on mount
+  }, []);
 
   // --- 2. Apply client-side filters (tab and search) whenever base data, tab, or search term changes ---
   useEffect(() => {
-    let result = allFetchedCards; // Start with all fetched card data
+    let result = allFetchedCards;
 
-    // First, filter by activeTab (status) if not 'all'
     if (activeTab !== 'all') {
       result = result.filter(project => project.status === activeTab);
     }
 
-    // Then, apply search filter if a searchTerm is present
     if (searchTerm) {
       const lowerCaseSearchTerm = searchTerm.toLowerCase();
       result = result.filter(
         project =>
           project.title.toLowerCase().includes(lowerCaseSearchTerm) ||
           project.description.toLowerCase().includes(lowerCaseSearchTerm) ||
-          project.contributors?.some(contributor => // Ensure contributors is handled as optional
+          project.contributors?.some(contributor =>
             contributor.toLowerCase().includes(lowerCaseSearchTerm)
           )
       );
     }
-    setDisplayedProjects(result); // Update the list for rendering
-  }, [allFetchedCards, activeTab, searchTerm]); // Dependencies for client-side filtering
+    setDisplayedProjects(result);
+  }, [allFetchedCards, activeTab, searchTerm]);
 
   // Helper to check if any projects exist for a given status (based on ALL fetched cards)
   const hasProjectsForTab = useCallback((status: string) => {
@@ -197,16 +187,17 @@ const Projects = () => {
           {displayedProjects.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
               {displayedProjects.map((project) => (
-                <ProjectCard
-                  key={project._id}
-                  _id={project._id}
-                  title={project.title}
-                  description={project.description}
-                  image={project.image}
-                  contributors={project.contributors || []} // Ensure contributors is always an array
-                  status={project.status || 'upcoming'} // Ensure status has a default if missing
-                  // Removed 'contentType' as it's no longer part of the unified model or returned by this endpoint
-                />
+                // Use the new AnimatedProjectCard wrapper
+                <AnimatedProjectCard key={project._id}>
+                  <ProjectCard
+                    _id={project._id}
+                    title={project.title}
+                    description={project.description}
+                    image={project.image}
+                    contributors={project.contributors || []}
+                    status={project.status || 'upcoming'}
+                  />
+                </AnimatedProjectCard>
               ))}
             </div>
           ) : (
@@ -230,3 +221,22 @@ const Projects = () => {
 };
 
 export default Projects;
+
+// New component for animating individual project cards
+const AnimatedProjectCard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { ref, inView } = useInView({
+    triggerOnce: true, // Animation only happens once
+    threshold: 0.1,    // Trigger when 10% of the component is visible
+  });
+
+  return (
+    <div
+      ref={ref}
+      className={`transition-all duration-700 ease-out
+        ${inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}
+      `}
+    >
+      {children}
+    </div>
+  );
+};
