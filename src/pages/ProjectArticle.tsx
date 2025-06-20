@@ -17,22 +17,20 @@ interface ContentItem {
   title: string;
   description: string;
   image: string;
-  author: { _id: string; name: string; email: string; } | string; // Expect populated author or just ID
+  // author: { _id: string; name: string; email: string; } | string; 
   published: boolean;
   createdAt: string;
   updatedAt?: string;
-  // Removed contentType: 'article' | 'project'; as it's no longer in the model
-  contributors?: string[]; // Optional, as some articles might not have them
-  status?: 'upcoming' | 'completed' | 'in-progress' | 'archived'; // Optional, as some articles might not have them
+  contributors?: string[]; 
+  status?: 'upcoming' | 'completed' | 'in-progress' | 'archived'; 
   
-  // These fields are now directly on the ContentItem
+  
   background?: string;
   methodology?: string;
-  results?: string; // Corrected to 'results' as per backend schema
+  results?: string; 
   conclusions?: string;
   recommendations?: string;
-  application?: string; // Matches 'application' in the backend model
-  // Removed 'body' and 'tags' as they were not in the final unified model fields
+  application?: string; 
 }
 
 const ProjectArticle = () => {
@@ -56,17 +54,6 @@ const ProjectArticle = () => {
         const response = await axios.get<ContentItem>(`${ARTICLES_API_URL}/${id}`);
         const fetchedContent = response.data;
 
-        // --- SIMPLIFIED VALIDATION ---
-        // Since we have a single model, we primarily check if the entry exists.
-        // The frontend can then decide how to render based on the presence of specific fields
-        // (e.g., if 'status' is 'completed' to show full detail, otherwise show a "coming soon" message).
-        // I've removed the `contentType` check because the backend no longer sends it.
-        // The `detailedProjectContent` check is also removed as fields are flat.
-
-        // You might still want to apply a client-side filter here if you ONLY
-        // want to show *completed* projects on this page. If the page is meant
-        // for *any* detailed article (whether project or not, completed or not),
-        // then remove this `if` block as well.
         if (fetchedContent.status !== 'completed' && fetchedContent.status !== 'in-progress') {
             setError('This project/article is not yet completed or in-progress, or its detailed content is not publicly available.');
             setProject(null);
@@ -150,11 +137,11 @@ const ProjectArticle = () => {
             <span>Contributors: {project.contributors?.join(', ') || 'N/A'}</span>
           </div>
           {/* Display author name if populated */}
-          {typeof project.author !== 'string' && (
+          {/* {typeof project.author !== 'string' && (
             <div className="mt-1 text-sm text-green-100">
               <span>Author: {project.author.name}</span>
             </div>
-          )}
+          )} */}
         </div>
       </div>
 
