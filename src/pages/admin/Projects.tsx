@@ -1,7 +1,9 @@
+// frontend/src/pages/admin/Projects.tsx
+
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Plus, Edit, Trash } from 'lucide-react';
-import AdminForm from '../../components/admin/AdminForm';
+import AdminForm from '../../components/admin/AdminForm'; // Ensure this path is correct
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 const ARTICLES_API_URL = `${API_BASE_URL}/articles`;
@@ -11,11 +13,11 @@ interface AdminContentItem {
   title: string;
   description: string;
   image: string;
-  author: { _id: string; name: string; email: string; } | string;
+  // author: { _id: string; name: string; email: string; } | string; // Ensure this is commented out or removed if not in schema
   published: boolean;
   createdAt: string;
   updatedAt?: string;
-  contributors?: string[];
+  contributors?: [];
   status: 'upcoming' | 'completed' | 'in-progress' | 'archived';
   background?: string;
   methodology?: string;
@@ -32,14 +34,10 @@ const Projects = () => {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingProject, setEditingProject] = useState<AdminContentItem | null>(null);
 
-  // Removed getToken function as authorization is no longer used here
-
-  // --- FETCH PROJECTS FOR ADMIN TABLE ---
   const fetchProjects = async () => {
     setLoading(true);
     setError(null);
     try {
-      // Removed config object as authorization header is no longer needed
       const response = await axios.get<AdminContentItem[]>(ARTICLES_API_URL);
       setProjects(response.data);
     } catch (err) {
@@ -59,35 +57,54 @@ const Projects = () => {
   }, []);
 
   // --- HANDLE CREATE ---
-  const handleCreate = async (data: Record<string, string>) => {
-    const contributorsArray = data.contributors ? data.contributors.split(',').map(c => c.trim()) : [];
-    
-    let backendStatus = data.status;
-    if (data.status === 'incomplete') {
-        backendStatus = 'upcoming'; 
+  const handleCreate = async ({ formData, imageFile, imageUrlInput }: { formData: Record<string, string>; imageFile: File | null; imageUrlInput: string }) => {
+    // You should use the raw formData.contributors string now that the backend parses it.
+    // So, remove the `contributorsArray` creation and JSON.stringify.
+    // const contributorsArray = formData.contributors ? formData.contributors.split(',').map(c => c.trim()) : [];
+
+    let backendStatus = formData.status;
+    if (formData.status === 'incomplete') {
+      backendStatus = 'upcoming';
     }
 
-    const newProjectPayload = {
-      title: data.title,
-      description: data.description,
-      image: data.image,
-      contributors: contributorsArray,
-      status: backendStatus,
-      background: data.background || '',
-      methodology: data.methodology || '',
-      results: data.results || '',
-      conclusions: data.conclusions || '',
-      recommendations: data.recommendations || '',
-      application: data.application || '',
-      published: false,
-    };
+    const dataToSend = new FormData();
+
+    // Append all form data fields
+    for (const key in formData) {
+      if (key === 'image') {
+        // Handle image separately below
+        continue;
+      }
+      // Special handling for contributors to send raw string
+      if (key === 'contributors') {
+          dataToSend.append('contributors', formData[key]); // Send as raw comma-separated string
+      } else if (key === 'status') {
+          dataToSend.append('status', backendStatus); // Use the adjusted status
+      }
+      else {
+        dataToSend.append(key, formData[key]);
+      }
+    }
+    // No need to append 'status' or 'contributors' here again.
+    // dataToSend.append('contributors', JSON.stringify(contributorsArray)); // REMOVE THIS LINE
+    // dataToSend.append('status', backendStatus); // REMOVE THIS LINE
+
+    dataToSend.append('published', 'false'); // Always default to false for create
+
+    if (imageFile) {
+      dataToSend.append('image', imageFile); // Append the actual file
+    } else if (imageUrlInput) {
+      dataToSend.append('image', imageUrlInput); // Append the URL string
+    } else {
+      alert('Please provide an image URL or upload an image file.');
+      setLoading(false);
+      return;
+    }
 
     try {
       setLoading(true);
-      // Removed config object and Authorization header
-      await axios.post(ARTICLES_API_URL, newProjectPayload, {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      await axios.post(ARTICLES_API_URL, dataToSend);
+
       setShowCreateForm(false);
       await fetchProjects();
     } catch (err) {
@@ -103,32 +120,46 @@ const Projects = () => {
   };
 
   // --- HANDLE EDIT ---
-  const handleEdit = async (data: Record<string, string>) => {
+  const handleEdit = async ({ formData, imageFile, imageUrlInput }: { formData: Record<string, string>; imageFile: File | null; imageUrlInput: string }) => {
     if (!editingProject) return;
 
-    const contributorsArray = data.contributors ? data.contributors.split(',').map(c => c.trim()) : [];
+    // You should use the raw formData.contributors string now that the backend parses it.
+    // So, remove the `contributorsArray` creation and JSON.stringify.
+    // const contributorsArray = formData.contributors ? formData.contributors.split(',').map(c => c.trim()) : [];
 
-    const updatedProjectPayload = {
-      title: data.title,
-      description: data.description,
-      image: data.image,
-      contributors: contributorsArray,
-      status: data.status,
-      background: data.background || '',
-      methodology: data.methodology || '',
-      results: data.results || '',
-      conclusions: data.conclusions || '',
-      recommendations: data.recommendations || '',
-      application: data.application || '',
-      published: editingProject.published,
-    };
+    const dataToSend = new FormData();
+
+    // Append all form data fields
+    for (const key in formData) {
+      if (key === 'image') {
+        // Handle image separately below
+        continue;
+      }
+      // Special handling for contributors to send raw string
+      if (key === 'contributors') {
+          dataToSend.append('contributors', formData[key]); // Send as raw comma-separated string
+      } else {
+        dataToSend.append(key, formData[key]);
+      }
+    }
+    // No need to append 'contributors' or 'status' here again.
+    // dataToSend.append('contributors', JSON.stringify(contributorsArray)); // REMOVE THIS LINE
+    // dataToSend.append('status', formData.status); // REMOVE THIS LINE
+
+    dataToSend.append('published', String(editingProject.published)); // Keep existing published status
+
+    if (imageFile) {
+      dataToSend.append('image', imageFile); // Append the actual file
+    } else if (imageUrlInput !== editingProject.image) { // Only send URL if it has changed
+      dataToSend.append('image', imageUrlInput);
+    }
+    // If no new file and URL hasn't changed, 'image' field is not appended to FormData,
+    // so the backend won't update it (it will retain the existing image).
 
     try {
       setLoading(true);
-      // Removed config object and Authorization header
-      await axios.put(`${ARTICLES_API_URL}/${editingProject._id}`, updatedProjectPayload, {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      await axios.put(`${ARTICLES_API_URL}/${editingProject._id}`, dataToSend);
+
       setEditingProject(null);
       await fetchProjects();
     } catch (err) {
@@ -149,7 +180,6 @@ const Projects = () => {
 
     try {
       setLoading(true);
-      // Removed config object and Authorization header
       await axios.delete(`${ARTICLES_API_URL}/${id}`);
       await fetchProjects();
     } catch (err) {
@@ -184,7 +214,7 @@ const Projects = () => {
           Create New
         </button>
       </div>
-      
+
       {/* Table */}
       <div className="bg-white shadow-md rounded-lg ">
         <table className="min-w-full divide-y divide-gray-200 overflow-x-auto ">
@@ -215,8 +245,8 @@ const Projects = () => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                    project.status === 'completed' 
-                      ? 'bg-green-100 text-green-800' 
+                    project.status === 'completed'
+                      ? 'bg-green-100 text-green-800'
                       : project.status === 'in-progress'
                       ? 'bg-blue-100 text-blue-800'
                       : project.status === 'upcoming'
@@ -246,7 +276,7 @@ const Projects = () => {
                 </td>
               </tr>
             ))}
-            
+
             {projects.length === 0 && (
               <tr>
                 <td colSpan={4} className="px-6 py-4 text-center text-sm text-gray-500">
@@ -257,7 +287,7 @@ const Projects = () => {
           </tbody>
         </table>
       </div>
-      
+
       {/* Create Form */}
       {showCreateForm && (
         <AdminForm
@@ -265,12 +295,12 @@ const Projects = () => {
           fields={[
             { name: 'title', label: 'Title', type: 'text', defaultValue: '', required: true },
             { name: 'description', label: 'Brief Description', type: 'textarea', defaultValue: '', required: true },
-            { name: 'image', label: 'Image URL', type: 'text', defaultValue: 'https://images.pexels.com/photos/2252584/pexels-photo-2252584.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', required: true },
+            { name: 'image', label: 'Image', type: 'imageUpload', defaultValue: '', required: true },
             { name: 'contributors', label: 'Contributors (comma-separated)', type: 'text', defaultValue: '' },
-            { 
-              name: 'status', 
-              label: 'Status', 
-              type: 'select', 
+            {
+              name: 'status',
+              label: 'Status',
+              type: 'select',
               defaultValue: 'upcoming',
               options: [
                 { value: 'upcoming', label: 'Upcoming' },
@@ -278,7 +308,7 @@ const Projects = () => {
                 { value: 'completed', label: 'Completed' },
                 { value: 'archived', label: 'Archived' }
               ],
-              required: true 
+              required: true
             },
             { name: 'background', label: 'Background', type: 'textarea', defaultValue: '' },
             { name: 'methodology', label: 'Methodology', type: 'textarea', defaultValue: '' },
@@ -291,7 +321,7 @@ const Projects = () => {
           onClose={() => setShowCreateForm(false)}
         />
       )}
-      
+
       {/* Edit Form */}
       {editingProject && (
         <AdminForm
@@ -299,12 +329,12 @@ const Projects = () => {
           fields={[
             { name: 'title', label: 'Title', type: 'text', defaultValue: editingProject.title, required: true },
             { name: 'description', label: 'Brief Description', type: 'textarea', defaultValue: editingProject.description, required: true },
-            { name: 'image', label: 'Image URL', type: 'text', defaultValue: editingProject.image, required: true },
+            { name: 'image', label: 'Image', type: 'imageUpload', defaultValue: editingProject.image, required: true },
             { name: 'contributors', label: 'Contributors (comma-separated)', type: 'text', defaultValue: editingProject.contributors?.join(', ') || '' },
-            { 
-              name: 'status', 
-              label: 'Status', 
-              type: 'select', 
+            {
+              name: 'status',
+              label: 'Status',
+              type: 'select',
               defaultValue: editingProject.status,
               options: [
                 { value: 'upcoming', label: 'Upcoming' },
@@ -312,7 +342,7 @@ const Projects = () => {
                 { value: 'completed', label: 'Completed' },
                 { value: 'archived', label: 'Archived' }
               ],
-              required: true 
+              required: true
             },
             { name: 'background', label: 'Background', type: 'textarea', defaultValue: editingProject.background || '' },
             { name: 'methodology', label: 'Methodology', type: 'textarea', defaultValue: editingProject.methodology || '' },
@@ -323,6 +353,7 @@ const Projects = () => {
           ]}
           onSubmit={handleEdit}
           onClose={() => setEditingProject(null)}
+          initialImageUrl={editingProject.image}
         />
       )}
     </div>

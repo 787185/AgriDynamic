@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { Routes, Route } from 'react-router-dom'; 
+import { Routes, Route, useLocation } from 'react-router-dom'; 
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
 import About from './pages/About';
+import WhatWeDo from './pages/WhatWeDo';
+import Institute from './pages/Institute';
 import Projects from './pages/Projects';
 import Contact from './pages/Contact';
 import ProjectArticle from './pages/ProjectArticle';
@@ -14,18 +16,24 @@ import Enquiries from './pages/admin/Enquiries';
 import AdminProjects from './pages/admin/Projects';
 import { AuthProvider } from './context/AuthContext';
 
+
 function App() {
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const location = useLocation();
+
+  const isAdminPage = location.pathname.startsWith('/admin');
 
   return (
     <AuthProvider>
       <div className="flex flex-col min-h-screen">
-        <Navbar onLoginClick={() => setShowLoginModal(true)} />
+        {!isAdminPage && <Navbar onLoginClick={() => setShowLoginModal(true)} />}
         <main className="flex-grow">
           <Routes>
             {/* Your routes go here directly */}
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
+            <Route path="/whatwedo" element={<WhatWeDo />} />
+            <Route path="/institute" element={<Institute />} />
             <Route path="/projects" element={<Projects />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/project/:id" element={<ProjectArticle />} />

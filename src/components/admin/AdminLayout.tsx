@@ -100,7 +100,7 @@ const AdminLayout = () => {
 
 
   return (
-    <div className="flex h-screen bg-gray-100 pt-16">
+    <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
       <div
         className={`fixed inset-y-0 left-0 z-30 w-64 bg-green-800 text-white transform ${
@@ -109,7 +109,8 @@ const AdminLayout = () => {
       >
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-center p-5 border-b border-green-700">
-            <span className="text-2xl font-bold">Admin DashBoard</span>
+            <span className="text-4xl font-bold">Admin DashBoard</span>
+            
           </div>
 
           <nav className="flex-grow py-4">
