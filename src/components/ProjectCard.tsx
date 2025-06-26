@@ -2,16 +2,17 @@
 import { Link } from 'react-router-dom';
 
 interface ProjectCardProps {
-  _id: string; // Changed from 'id: number' to '_id: string' for MongoDB compatibility
+  _id: string; 
   title: string;
-  description: string; // Brief Description
-  image: string; // Image URL
-  contributors: string[]; // Contributors
-  status: 'upcoming' | 'completed' | 'in-progress' | 'archived'; // More detailed statuses
-  contentType: 'article' | 'project'; // To ensure we're only rendering project cards
+  description: string; 
+  image: string; 
+  contributors: string[]; 
+  status: 'upcoming' | 'completed' | 'in-progress' | 'archived'; 
+  contentType: 'article' | 'project'; 
+  hiddenButton?: string;
 }
 
-const ProjectCard = ({ _id, title, description, image, contributors, status}: ProjectCardProps) => {
+const ProjectCard = ({ _id, title, description, image, contributors, status,hiddenButton}: ProjectCardProps) => {
   
   return (
     <div className="bg-white rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:-translate-y-1 h-full flex flex-col">
@@ -52,7 +53,7 @@ const ProjectCard = ({ _id, title, description, image, contributors, status}: Pr
 
         {/* Show "Read More" button only if the project is completed */}
         {status === 'completed' && (
-          <div className='flex justify-center'>
+          <div className={`flex justify-center ${hiddenButton}`}>
             <Link
               to={`/project/${_id}`}
               className="inline-block w-fit text-center px-6 py-2 bg-green-700 hover:bg-green-800 text-white rounded-3xl transition-colors duration-200"

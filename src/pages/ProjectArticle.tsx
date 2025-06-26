@@ -1,6 +1,6 @@
 // frontend/src/pages/ProjectArticle.tsx
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Loader } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
@@ -79,7 +79,9 @@ const ProjectArticle = () => {
   if (loading) {
     return (
       <div className="pt-24 pb-16 px-4 text-center text-xl text-gray-700">
-        Loading project/article details...
+        <div className='flex justify-center text-4xl'>
+           Article Loading   <Loader  className='animate-spin h-10 w-10'/>
+        </div>
       </div>
     );
   }

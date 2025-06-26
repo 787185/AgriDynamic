@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Plus, Edit, Trash } from 'lucide-react';
+import { Plus, Edit, Trash, Loader } from 'lucide-react';
 import AdminForm from '../../components/admin/AdminForm'; // Ensure this path is correct
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
@@ -195,7 +195,11 @@ const Projects = () => {
   };
 
   if (loading) {
-    return <div className="p-4 text-center text-gray-700">Loading projects...</div>;
+    return <div className="p-4 text-center text-gray-700">
+      <div className='flex justify-center text-4xl'>
+        Loading   <Loader  className='animate-spin h-10 w-10'/>
+      </div>
+    </div>;
   }
 
   if (error) {

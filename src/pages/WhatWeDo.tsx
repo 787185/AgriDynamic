@@ -102,7 +102,7 @@ const WhatWeDo = () => {
     <div className="pt-16">
       {/* Hero Section */}
       <HeroSection
-        videoSrc="https://images.pexels.com/photos/7944157/pexels-photo-7944157.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+        mediaSrc="/pictures/seminar.jpg"
         title="What We Do"
         subtitle="Comprehensive programs that address the root causes of rural poverty and exclusion"
         height="h-[70vh]"

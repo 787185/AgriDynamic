@@ -1,10 +1,84 @@
+// frontend/src/pages/Institute.tsx
 import { useEffect, useState } from 'react';
+import axios from 'axios'; // Import axios for API calls
 import { BookOpen, Users, Target, Award, Lightbulb, Globe } from 'lucide-react';
 import HeroSection from '../components/HeroSection';
 import ScrollableSection from '../components/ScrollableSection';
+// IMPORTANT: Remove 'projects' import from here, as we will fetch them dynamically
 import { researchFocusCards } from '../data';
+import ProjectCard from '../components/ProjectCard';
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+
+// Define the API URL for fetching articles/projects
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const ARTICLES_CARDS_API_URL = `${API_BASE_URL}/articles/cards`;
+
+// Define the interface for the fetched project data (consistent with Projects.tsx and your backend model)
+interface ContentItem {
+  _id: string; // This is crucial for linking to detailed pages
+  title: string;
+  description: string;
+  image: string;
+  author?: string; // Optional, as not all card data might have it
+  status: 'upcoming' | 'completed' | 'in-progress' | 'archived';
+  contributors?: string[];
+  // Other fields from the full article that might not be in the card summary
+}
 
 const Institute = () => {
+  // IMPORTANT: State to hold dynamically fetched projects for this section
+  const [featuredProjects, setFeaturedProjects] = useState<ContentItem[]>([]);
+  const [loadingProjects, setLoadingProjects] = useState(true);
+  const [errorProjects, setErrorProjects] = useState<string | null>(null);
+
+  // IMPORTANT: useEffect to fetch projects when component mounts
+  useEffect(() => {
+    const fetchFeaturedProjects = async () => {
+      try {
+        setLoadingProjects(true);
+        // Fetch all articles suitable for cards from your backend
+        const response = await axios.get<ContentItem[]>(ARTICLES_CARDS_API_URL);
+
+        // Filter for 'completed' projects and take a specific number (e.g., the first 3)
+        const completedProjects = response.data
+          .filter(project => project.status === 'completed')
+          .slice(1, 5); // Slice to get only the first 3 completed projects
+
+        setFeaturedProjects(completedProjects);
+      } catch (err) {
+        console.error('Error fetching featured projects for Institute page:', err);
+        setErrorProjects('Failed to load featured projects. Please try again later.');
+      } finally {
+        setLoadingProjects(false);
+      }
+    };
+
+    fetchFeaturedProjects();
+  }, []); // Empty dependency array means this useEffect runs once on mount
+
+  // Define animation variants for common effects
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 50 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
+  };
+
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2, // Delay between each child animation
+        delayChildren: 0.3,   // Delay before first child animation starts
+      },
+    },
+  };
+
+  const scaleUp = {
+    hidden: { opacity: 0, scale: 0.8 },
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.6, ease: 'easeOut' } },
+  };
+
   const [isVisible, setIsVisible] = useState({
     about: false,
     mission: false,
@@ -72,9 +146,9 @@ const Institute = () => {
     <div className="pt-16">
       {/* Hero Section */}
       <HeroSection
-        videoSrc="https://images.pexels.com/photos/590022/pexels-photo-590022.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+        mediaSrc="/pictures/ARI.jpg"
         title="AgriDynamic Research & Innovation Institute"
-        subtitle="FairEducation: Generating evidence that drives inclusive agricultural development"
+        subtitle="Generating evidence that drives inclusive agricultural development"
         height="h-[70vh]"
       />
 
@@ -85,10 +159,10 @@ const Institute = () => {
             <div className={`transition-all duration-1000 ${
               isVisible.about ? 'animate-fade-in-left opacity-100' : 'opacity-0 translate-x-8'
             }`}>
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">About FairEducation Institute</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-6">About AgriDynamic Research and Innovation Institute</h2>
               <div className="space-y-4 text-gray-700">
                 <p>
-                  The AgriDynamic Research and Innovation Institute, known as FairEducation, is our dedicated research arm that generates evidence-based insights to inform agricultural development policies and programs.
+                  The AgriDynamic Research and Innovation Institute is our dedicated research arm that generates evidence-based insights to inform agricultural development policies and programs.
                 </p>
                 <p>
                   Founded on the principle that "evidence is powerful—and it's even more powerful when it comes from those who live the reality," we conduct inclusive, action-oriented research that amplifies the voices of underprivileged populations.
@@ -98,14 +172,14 @@ const Institute = () => {
                 </p>
               </div>
             </div>
-            
+
             <div className={`transition-all duration-1000 delay-300 ${
               isVisible.about ? 'animate-fade-in-right opacity-100' : 'opacity-0 translate-x-8'
             }`}>
               <div className="relative">
-                <img 
-                  src="https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" 
-                  alt="Research Team" 
+                <img
+                  src="/pictures/about.jpg"
+                  alt="Research Team"
                   className="rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-green-600/20 to-transparent rounded-lg"></div>
@@ -116,7 +190,7 @@ const Institute = () => {
       </section>
 
       {/* Mission & Vision */}
-      <section data-section="mission" className="py-16 bg-gray-50 overflow-hidden">
+      <section data-section="mission" className="py-16 bg-green-100 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className={`text-3xl font-bold text-gray-900 mb-6 transition-all duration-1000 ${
@@ -125,7 +199,7 @@ const Institute = () => {
               Our Mission & Vision
             </h2>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className={`bg-white p-8 rounded-lg shadow-md hover:shadow-lg transition-all duration-500 hover:-translate-y-1 ${
               isVisible.mission ? 'animate-fade-in-up opacity-100 animate-delay-200' : 'opacity-0 translate-y-8'
@@ -138,7 +212,7 @@ const Institute = () => {
                 To generate rigorous, inclusive research that informs evidence-based policies and programs for sustainable agricultural development, ensuring that the voices and experiences of underprivileged communities are central to development planning and implementation.
               </p>
             </div>
-            
+
             <div className={`bg-white p-8 rounded-lg shadow-md hover:shadow-lg transition-all duration-500 hover:-translate-y-1 ${
               isVisible.mission ? 'animate-fade-in-up opacity-100 animate-delay-400' : 'opacity-0 translate-y-8'
             }`}>
@@ -162,14 +236,14 @@ const Institute = () => {
           }`}>
             Key Research Areas
           </h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {researchAreas.map((area, index) => (
-              <div 
+              <div
                 key={index}
                 className={`text-center p-6 bg-gray-50 rounded-lg hover:bg-green-50 transition-all duration-500 hover:-translate-y-1 group ${
-                  isVisible.approach 
-                    ? `animate-fade-in-up opacity-100 animate-delay-${(index + 2) * 100}` 
+                  isVisible.approach
+                    ? `animate-fade-in-up opacity-100 animate-delay-${(index + 2) * 100}`
                     : 'opacity-0 translate-y-8'
                 }`}
               >
@@ -194,23 +268,22 @@ const Institute = () => {
         subtitle="How we generate evidence that drives impact"
         cards={researchFocusCards}
       />
-
-      {/* Impact & Achievements */}
-      <section data-section="impact" className="py-16 bg-gray-50 overflow-hidden">
+{/* Impact & Achievements */}
+      <section data-section="impact" className="py-16  overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className={`text-3xl font-bold text-gray-900 mb-12 text-center transition-all duration-1000 ${
             isVisible.impact ? 'animate-fade-in-up opacity-100' : 'opacity-0 translate-y-8'
           }`}>
             Research Impact & Achievements
           </h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {achievements.map((achievement, index) => (
-              <div 
+              <div
                 key={index}
                 className={`bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition-all duration-500 hover:-translate-y-1 text-center group ${
-                  isVisible.impact 
-                    ? `animate-fade-in-up opacity-100 animate-delay-${(index + 2) * 100}` 
+                  isVisible.impact
+                    ? `animate-fade-in-up opacity-100 animate-delay-${(index + 2) * 100}`
                     : 'opacity-0 translate-y-8'
                 }`}
               >
@@ -225,6 +298,61 @@ const Institute = () => {
           </div>
         </div>
       </section>
+
+      {/* Featured Projects Section */}
+      <motion.section
+        className="py-16 bg-green-100"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={staggerContainer} // Stagger container for child ProjectCards
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
+          <motion.div variants={fadeInUp} className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900">Featured Projects</h2>
+            <p className="mt-4 text-xl text-gray-600">Highlights from our completed research</p>
+          </motion.div>
+
+          {/* IMPORTANT: Conditional rendering based on loading/error/data */}
+          {loadingProjects ? (
+            <div className="text-center text-gray-600">Loading featured projects...</div>
+          ) : errorProjects ? (
+            <div className="text-center text-red-600">Error: {errorProjects}</div>
+          ) : featuredProjects.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {featuredProjects.map((project) => (
+                // IMPORTANT: Pass project._id directly
+                <motion.div key={project._id} variants={scaleUp}>
+                  <ProjectCard
+                    _id={project._id} // Pass _id from fetched data
+                    title={project.title}
+                    description={project.description}
+                    image={project.image}
+                    contributors={project.contributors || []}
+                    status={project.status || 'upcoming'}
+                    contentType="project"
+                    hiddenButton='hidden'
+                    // If you want to hide the "Read More" button on these cards,
+                    // you'll need to add a `hideButton` prop to ProjectCard.tsx and pass it here:
+                    // hideButton={true}
+                  />
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-gray-600">No featured projects found.</div>
+          )}
+
+          <motion.div variants={fadeInUp} className="mt-12 text-center">
+            <Link
+              to="/projects"
+              className="inline-block px-6 py-3 bg-green-700 hover:bg-green-800 text-white font-medium rounded-3xl transition-colors duration-200"
+            >
+              View All Projects
+            </Link>
+          </motion.div>
+        </div>
+      </motion.section>
 
       {/* Partnerships */}
       <section data-section="partnerships" className="py-16 bg-gradient-to-r from-green-700 to-green-900 text-white overflow-hidden">

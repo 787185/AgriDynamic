@@ -1,7 +1,7 @@
 // frontend/src/pages/Projects.tsx
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { Search } from 'lucide-react'; // Import the Search icon
+import { Loader, Search } from 'lucide-react'; // Import the Search icon
 import ProjectCard from '../components/ProjectCard'; // Assuming this component exists
 import { useInView } from 'react-intersection-observer'; // Import useInView
 
@@ -82,7 +82,11 @@ const Projects = () => {
   }, [allFetchedCards]);
 
   if (loading) {
-    return <div className="pt-24 pb-16 px-4 text-center text-xl text-gray-700">Loading projects...</div>;
+    return <div className="pt-24 pb-16 px-4  text-xl text-gray-700">
+      <div className='flex justify-center text-4xl'>
+          Loading   <Loader  className='animate-spin h-10 w-10'/>
+      </div>
+     </div>;
   }
 
   if (error) {

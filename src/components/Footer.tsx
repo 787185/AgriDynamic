@@ -4,14 +4,14 @@ import { Link } from 'react-router-dom';
 const Footer = () => {
   return (
     <footer className="bg-gradient-to-r from-green-600 to-green-950 text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+      <div className=" px-4 sm:px-3 lg:px-4 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 ">
           {/* Column 1 - About */}
           <div>
             <div className="flex items-center mb-4">
-              <img src="/pictures/logo.png" alt="AgriDynamic" width={170}height={100}/>
+              <img src="/pictures/logo.png" alt="AgriDynamic" width={370}height={300}/>
             </div>
-            <p className="text-green-100 mb-4">
+            <p className="text-green-100 lg:text-2xl mb-4">
               Empowering underprivileged communities through innovative, sustainable agricultural solutions since 2008.
             </p>
             <div className="flex space-x-4">
@@ -21,8 +21,8 @@ const Footer = () => {
 
           {/* Column 2 - Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
-            <ul className="space-y-2 hover:text-green-200">
+            <h3 className="text-lg font-semibold mb-4 lg:text-5xl">Quick Links</h3>
+            <ul className="space-y-2 hover:text-green-200 lg:text-2xl">
               <li>
                 <Link to="/" className="text-green-100 hover:text-white transition-colors duration-200">
                   Home
@@ -48,8 +48,8 @@ const Footer = () => {
 
           {/* Column 3 - Our Focus */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Our Focus</h3>
-            <ul className="space-y-2">
+            <h3 className="text-lg font-semibold mb-4 lg:text-5xl">Our Focus</h3>
+            <ul className="space-y-2 lg:text-2xl">
               <li className="text-green-100">Training Programs</li>
               <li className="text-green-100">Inclusive Value Chains</li>
               <li className="text-green-100">Access to Agri-Finance</li>
@@ -59,9 +59,9 @@ const Footer = () => {
 
           {/* Column 4 - Contact */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
-            <ul className="space-y-3">
-              <li className="flex items-start">
+            <h3 className="text-lg font-semibold mb-4 lg:text-5xl">Contact Us</h3>
+            <ul className="space-y-3 lg:text-2xl">
+              <li className="flex items-start ">
                 <MapPin className="h-5 w-5 mr-2 mt-0.5 text-green-300" />
                 <span className="text-green-100">North West Region Cameroon BP 02 Ndop</span>
               </li>

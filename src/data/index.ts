@@ -80,7 +80,7 @@ export const researchFocusCards = [
     id: 2,
     title: 'Informing Impact & Policy',
     description: 'Our research informs not only our own programming but also supports broader systems change by shaping policies, funding strategies, and institutional mindsets. We bridge the gap between grassroots realities and high-level decision-making.',
-    image: 'https://images.pexels.com/photos/6169/woman-hand-desk-office.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
+    image: '/pictures/Project Steering.jpg'
   },
   {
     id: 3,

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash } from 'lucide-react';
+import { Plus, Edit, Trash, Loader } from 'lucide-react';
 import AdminForm from '../../components/admin/AdminForm';
 import axios from 'axios';
 
@@ -74,7 +74,11 @@ const Volunteers = () => {
   };
 
   if (loading) {
-    return <div className="text-center py-8">Loading volunteers...</div>;
+    return <div className="text-center py-8">
+      <div className='flex justify-center text-4xl'>
+        Loading   <Loader  className='animate-spin h-10 w-10'/>
+      </div>
+    </div>;
   }
 
   if (error) {

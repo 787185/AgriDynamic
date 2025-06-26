@@ -41,23 +41,23 @@ const Navbar = ({ onLoginClick }: NavbarProps) => {
   ];
 
   return (
-    <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-gradient-to-r from-green-600 to-green-950 shadow-lg' : 'bg-gradient-to-r from-green-300 to-green-600'}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex items-center">
+    <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-gradient-to-r from-green-600 to-green-950 shadow-lg' : 'bg-gradient-to-r from-green-600 to-green-950'}`}>
+      <div className=" px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between ">
+          <div className="flex items-center h-32">
             <NavLink to="/" className="flex items-center ">
-              <img src="/pictures/logo.png" alt="AgriDynamic" width={170}height={100}/>
+              <img src="/pictures/logo.png" alt="AgriDynamic" width={270}height={200}/>
             </NavLink>
           </div>
           
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-4 ">
             {navLinks.map((link) => (
               <NavLink
                 key={link.name}
                 to={link.path}
                 className={({ isActive }) => 
-                  `px-3 py-2 text-sm font-medium transition-colors duration-200 ${
+                  `px-3 py-2 text-sm lg:text-2xl font-medium transition-colors duration-200 ${
                     isActive 
                       ? 'text-white underline underline-offset-4' 
                       : 'text-green-100 hover:text-white'

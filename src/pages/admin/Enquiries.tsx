@@ -1,6 +1,6 @@
 // frontend/src/pages/admin/Enquiries.tsx
 import { useState, useEffect } from 'react';
-import { Edit, Trash } from 'lucide-react';
+import { Edit, Loader, Trash } from 'lucide-react';
 import AdminForm from '../../components/admin/AdminForm';
 import axios from 'axios';
 
@@ -100,7 +100,11 @@ const Enquiries = () => {
 
   if (loading) {
     return (
-      <div className="pt-16 pb-16 px-4 text-center text-xl text-gray-700">Loading enquiries...</div>
+      <div className="pt-16 pb-16 px-4 text-center text-xl text-gray-700">
+        <div className='flex justify-center text-4xl'>
+            Loading   <Loader className='animate-spin h-10 w-10'/>
+        </div>
+      </div>
     );
   }
 

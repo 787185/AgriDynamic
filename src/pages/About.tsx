@@ -9,7 +9,7 @@ const About = () => {
     <div className="pt-16">
       {/* Hero Section with Map - typically full-page, so no scroll animation needed */}
       <HeroSection
-        videoSrc="https://images.pexels.com/photos/1483880/pexels-photo-1483880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+        mediaSrc="/pictures/IL.jpg"
         title="About AgriDynamic"
         subtitle="Empowering communities through sustainable agricultural solutions since 2008"
         height="h-[60vh]"
