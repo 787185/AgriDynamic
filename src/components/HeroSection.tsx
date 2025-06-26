@@ -42,7 +42,7 @@ const HeroSection = ({
           loop
           muted
           playsInline
-          className="absolute inset-0 min-w-full min-h-full object-cover"
+          className="absolute inset-0 max-w-full max-h-full object-cover"
           src={mediaSrc} // Use mediaSrc
         />
       ) : isImage ? (
