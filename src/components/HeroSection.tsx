@@ -64,10 +64,10 @@ const HeroSection = ({
       {/* Content */}
       <div className="relative h-full flex flex-col items-center justify-center text-center px-4 sm:px-6 lg:px-8">
         <div className="">
-          <h1 className="text-8xl sm:text-6xl md:text-9xl font-bold text-white mb-6 leading-tight">
+          <h1 className="text-7xl sm:text-5xl md:text-8xl font-bold text-white mb-6 leading-tight">
             {title}
           </h1>
-          <p className="text-5xl sm:text-4xl text-gray-200 mb-8 font-semibold">
+          <p className="text-5xl sm:text-4xl text-gray-200 mb-8 ">
             {subtitle}
           </p>
           {buttonText && buttonLink && (
