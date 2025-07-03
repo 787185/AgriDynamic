@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
 import About from './pages/About';
+import PartnerAdmin from './pages/admin/Partner';
 import WhatWeDo from './pages/WhatWeDo';
 import Institute from './pages/Institute';
 import Projects from './pages/Projects';
@@ -47,6 +48,7 @@ function App() {
               <Route path="volunteers" element={<Volunteers />} />
               <Route path="enquiries" element={<Enquiries />} />
               <Route path="projects" element={<AdminProjects />} />
+              <Route path="partner" element={<PartnerAdmin />} /> 
             </Route>
 
             {/* Potentially add a 404 route */}

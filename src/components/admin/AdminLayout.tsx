@@ -41,7 +41,9 @@ const AdminLayout = () => {
   const navLinks = [
     { name: 'Volunteers', path: '/admin/volunteers', icon: <Users className="h-5 w-5" /> },
     { name: 'Enquiries', path: '/admin/enquiries', icon: <MessageSquare className="h-5 w-5" /> },
-    { name: 'Projects', path: '/admin/projects', icon: <FileText className="h-5 w-5" /> }
+    
+    { name: 'Projects', path: '/admin/projects', icon: <FileText className="h-5 w-5" /> },
+    { name: 'Partners', path: '/admin/partner', icon: <MessageSquare className="h-5 w-5" /> },
   ];
 
   // Function to handle the form submission for updating profile

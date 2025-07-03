@@ -42,14 +42,14 @@ const HeroSection = ({
           loop
           muted
           playsInline
-          className="absolute inset-0 max-w-full max-h-full object-cover"
+          className="absolute inset-0 min-w-full min-h-full object-cover"
           src={mediaSrc} // Use mediaSrc
         />
       ) : isImage ? (
         <img
           src={mediaSrc} // Use mediaSrc
           alt={title + " Background"} // Add alt text for accessibility
-          className="absolute inset-0 min-w-full min-h-full object-cover"
+          className="absolute inset-0 w-full h-full object-fill"
         />
       ) : (
         // Fallback or error if mediaSrc is neither video nor image
@@ -63,8 +63,8 @@ const HeroSection = ({
 
       {/* Content */}
       <div className="relative h-full flex flex-col items-center justify-center text-center px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl">
-          <h1 className="text-8xl sm:text-6xl md:text-7xl font-extrabold text-white mb-6 leading-tight border-b-4 ">
+        <div className="">
+          <h1 className="text-8xl sm:text-6xl md:text-9xl font-bold text-white mb-6 leading-tight">
             {title}
           </h1>
           <p className="text-5xl sm:text-4xl text-gray-200 mb-8 font-semibold">

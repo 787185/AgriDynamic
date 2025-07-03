@@ -1,10 +1,47 @@
+// frontend/src/pages/About.tsx
+import React, { useState, useEffect } from 'react'; // Import useState and useEffect
 import { Link } from 'react-router-dom';
 import HeroSection from '../components/HeroSection';
 import TeamMember from '../components/TeamMember';
 import { teamMembers } from '../data';
-import { useInView } from 'react-intersection-observer'; // Import useInView
+import { useInView } from 'react-intersection-observer';
+import axios from 'axios'; // Import axios for API calls
+
+// Define the Partner interface to match your backend model
+interface Partner {
+  _id: string;
+  name: string;
+  logo: string;
+  description?: string;
+  link: string;
+}
 
 const About = () => {
+  const [partners, setPartners] = useState<Partner[]>([]);
+  const [loadingPartners, setLoadingPartners] = useState(true);
+  const [partnersError, setPartnersError] = useState<string | null>(null);
+
+  // Base URL for your API from environment variables
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+
+  useEffect(() => {
+    const fetchPartners = async () => {
+      setLoadingPartners(true);
+      setPartnersError(null);
+      try {
+        const response = await axios.get<Partner[]>(`${API_BASE_URL}/partners`);
+        setPartners(response.data);
+      } catch (err) {
+        console.error('Error fetching partners:', err);
+        setPartnersError('Failed to load partners. Please try again later.');
+      } finally {
+        setLoadingPartners(false);
+      }
+    };
+
+    fetchPartners();
+  }, []); // Empty dependency array means this runs once on mount
+
   return (
     <div className="pt-16">
       {/* Hero Section with Map - typically full-page, so no scroll animation needed */}
@@ -16,7 +53,7 @@ const About = () => {
       />
 
       {/* Our Story */}
-      <AnimatedSection> {/* Wrap section with AnimatedSection */}
+      <AnimatedSection>
         <section className="py-16 bg-white">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Our Story</h2>
@@ -36,13 +73,13 @@ const About = () => {
       </AnimatedSection>
 
       {/* Google Maps Embed */}
-      <AnimatedSection> {/* Wrap section with AnimatedSection */}
+      <AnimatedSection>
         <section className="py-8 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">Find Us</h3>
             <div className="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden shadow-lg">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d127120.87624372654!2d10.3121611!3d6.0018302!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x105f8f2e2d8e3a15%3A0x4c4f9a3c1f1c43e0!2sNdop%2C%20Cameroon!5e0!3m2!1sen!2sus!4v1651234567890!5m2!1sen!2sus"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15878.78440939527!2d10.5186001!3d5.9388308!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x105f99238f42777f%3A0x2a048737c355c2d!2sNdop!5e0!3m2!1sen!2scm!4v1700000000000!5m2!1sen!2scm"
                 width="100%"
                 height="450"
                 style={{ border: 0 }}
@@ -61,7 +98,7 @@ const About = () => {
       </AnimatedSection>
 
       {/* Our Impact */}
-      <AnimatedSection> {/* Wrap section with AnimatedSection */}
+      <AnimatedSection>
         <section className="py-16 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Our Impact So Far</h2>
@@ -102,7 +139,7 @@ const About = () => {
       </AnimatedSection>
 
       {/* Our Team */}
-      <AnimatedSection> {/* Wrap section with AnimatedSection */}
+      <AnimatedSection>
         <section className="py-16 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Our Team</h2>
@@ -124,8 +161,47 @@ const About = () => {
         </section>
       </AnimatedSection>
 
+      {/* Our Valued Partners (NEW SECTION) */}
+      <AnimatedSection>
+        <section className="py-16 bg-gradient-to-r from-green-700 to-green-900">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="text-3xl font-bold text-white mb-8">Our Valued Partners</h2>
+            {loadingPartners ? (
+              <p className="text-white">Loading partners...</p>
+            ) : partnersError ? (
+              <p className="text-red-600">{partnersError}</p>
+            ) : partners.length === 0 ? (
+              <p className="text-white text-xl">No partners to display yet.</p>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8 items-center justify-center">
+                {partners.map((partner) => (
+                  <a
+                    key={partner._id}
+                    href={partner.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center p-4 bg-gray-50 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 transform hover:scale-105"
+                    title={partner.name}
+                  >
+                    <img
+                      src={partner.logo}
+                      alt={`${partner.name} logo`}
+                      className="max-h-20 max-w-full object-contain"
+                      onError={(e) => (e.currentTarget.src = 'https://via.placeholder.com/120x60?text=Logo')}
+                    />
+                  </a>
+                  
+                ))}
+                
+              </div>
+            )}
+          </div>
+        </section>
+      </AnimatedSection>
+
+
       {/* Join Us / Partnerships */}
-      <AnimatedSection> {/* Wrap section with AnimatedSection */}
+      <AnimatedSection>
         <section className="py-16 bg-gradient-to-r from-green-700 to-green-900 text-white">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl font-bold mb-6">Partner With Us</h2>
@@ -148,11 +224,11 @@ const About = () => {
 
 export default About;
 
-// New component for animating sections
+// AnimatedSection component remains the same
 const AnimatedSection: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { ref, inView } = useInView({
-    triggerOnce: true, // Animation only happens once
-    threshold: 0.1,    // Trigger when 10% of the component is visible
+    triggerOnce: true,
+    threshold: 0.1,
   });
 
   return (
