@@ -5,43 +5,36 @@ export const teamMembers = [
   {
     id: 1,
     name: 'Vera Bekebang Mbouh',
-    role: 'Executive Director',
     image: 'https://images.pexels.com/photos/3769021/pexels-photo-3769021.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
   },
   {
     id: 2,
     name: 'Gaston Gwemelang Ngochembo',
-    role: 'Operations Manager',
     image: 'https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
   },
   {
     id: 3,
     name: 'Honest Kfetua Ful',
-    role: 'Research Lead',
     image: 'https://images.pexels.com/photos/2613260/pexels-photo-2613260.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
   },
   {
     id: 4,
     name: 'Lufung N. Lewis',
-    role: 'Program Coordinator',
     image: 'https://images.pexels.com/photos/3778603/pexels-photo-3778603.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
   },
   {
     id: 5,
     name: 'Derick Tanka Vershiyi',
-    role: 'Field Officer',
     image: 'https://images.pexels.com/photos/3785424/pexels-photo-3785424.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
   },
   {
     id: 6,
     name: 'Magnus Tafili',
-    role: 'Community Liaison',
     image: 'https://images.pexels.com/photos/3785074/pexels-photo-3785074.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
   },
   {
     id: 7,
     name: 'Fayis Lih Nembu',
-    role: 'Finance Officer',
     image: 'https://images.pexels.com/photos/3771839/pexels-photo-3771839.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
   }
 ];

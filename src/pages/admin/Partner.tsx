@@ -6,11 +6,11 @@ import AdminForm from '../../components/admin/AdminForm'; // Ensure this path is
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 const PARTNERS_API_URL = `${API_BASE_URL}/partners`; // Changed API endpoint to partners
 
-// Define the interface for a Partner as it would be returned from your backend
+
 interface Partner {
   _id: string;
   name: string;
-  logo: string; // Assuming 'logo' is the image URL
+  logo: string; 
   link: string;
   description: string;
   createdAt: string;
@@ -216,8 +216,8 @@ const Partners = () => {
                   {partner.name}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <a href={partner.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                    {partner.website}
+                  <a href={partner.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                    {partner.link}
                   </a>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">

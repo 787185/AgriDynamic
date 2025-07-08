@@ -152,7 +152,6 @@ const About = () => {
                 <TeamMember
                   key={member.id}
                   name={member.name}
-                  role={member.role}
                   image={member.image}
                 />
               ))}

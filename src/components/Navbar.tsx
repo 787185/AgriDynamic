@@ -41,7 +41,7 @@ const Navbar = ({ onLoginClick }: NavbarProps) => {
   ];
 
   return (
-    <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-gradient-to-r from-green-600 to-green-950 shadow-lg' : 'bg-gradient-to-r from-green-600 to-green-950'}`}>
+    <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-gradient-to-r from-green-500 to-green-950 shadow-lg' : 'bg-gradient-to-r from-green-500 to-green-950'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
